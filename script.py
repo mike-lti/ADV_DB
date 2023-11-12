@@ -23,7 +23,10 @@ df_selected.to_csv("Tabela1.csv", index=True)
 df_selected1.to_csv("Tabela2.csv", index=True)
 df_selected2.to_csv("Tabela3.csv", index=True)
 
-df_selected.to_json("Tabela1.json",orient="records", lines=True)
-df_selected1.to_json("Tabela2.json",orient="records", lines=True)
-df_selected2.to_json("Tabela3.json",orient="records", lines=True)
+df_selected.to_json("Tabela1.json",orient = "records", date_format = "epoch", 
+double_precision = 10, force_ascii = True, date_unit = "ms", default_handler = None, indent=2)
+df_selected1.to_json("Tabela2.json",orient = "records", date_format = "epoch", 
+double_precision = 10, force_ascii = True, date_unit = "ms", default_handler = None, indent=2)
+df_selected2.to_json("Tabela3.json",orient = "records", date_format = "epoch", 
+double_precision = 10, force_ascii = True, date_unit = "ms", default_handler = None, indent=2)
 
