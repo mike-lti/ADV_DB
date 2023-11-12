@@ -19,14 +19,19 @@ df_selected1 = df[columns1]
 
 df_selected2 = df[columns2]
 
-df_selected.to_csv("Tabela1.csv", index=True)
-df_selected1.to_csv("Tabela2.csv", index=True)
-df_selected2.to_csv("Tabela3.csv", index=True)
+df_selected.to_csv("Tabela1.csv", index=True, index_label="id_reservation")
+df_selected1.to_csv("Tabela2.csv", index=True, index_label="id_reservation")
+df_selected2.to_csv("Tabela3.csv", index=True, index_label="id_reservation")
 
-df_selected.to_json("Tabela1.json",orient = "records", date_format = "epoch", 
+df1 = pd.read_csv('Tabela1.csv')
+df2 = pd.read_csv('Tabela2.csv')
+df3 = pd.read_csv('Tabela3.csv')
+
+
+df1.to_json("Tabela1.json",orient = "records", date_format = "epoch", 
 double_precision = 10, force_ascii = True, date_unit = "ms", default_handler = None, indent=2)
-df_selected1.to_json("Tabela2.json",orient = "records", date_format = "epoch", 
+df2.to_json("Tabela2.json",orient = "records", date_format = "epoch", 
 double_precision = 10, force_ascii = True, date_unit = "ms", default_handler = None, indent=2)
-df_selected2.to_json("Tabela3.json",orient = "records", date_format = "epoch", 
+df3.to_json("Tabela3.json",orient = "records", date_format = "epoch", 
 double_precision = 10, force_ascii = True, date_unit = "ms", default_handler = None, indent=2)
 

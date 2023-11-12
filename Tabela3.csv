@@ -1,4 +1,4 @@
-,stays_in_week_nights,stays_in_weekend_nights,adults,children,babies,required_car_parking_spaces,meal,reserved_room_type,total_of_special_requests
+id_reservation,stays_in_week_nights,stays_in_weekend_nights,adults,children,babies,required_car_parking_spaces,meal,reserved_room_type,total_of_special_requests
 0,0,0,2,0.0,0,0,BB,C,0
 1,0,0,2,0.0,0,0,BB,C,0
 2,1,0,1,0.0,0,0,BB,A,0
