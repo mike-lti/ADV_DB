@@ -15,9 +15,24 @@ data3 = json.load(f)
 
 db=client.DataBaseProj
 
-db.create_collection('Main_Info')
-db.create_collection('Reservas_Status')
-db.create_collection('Stays_Info')
+collist = db.list_collection_names()
+
+if "Main_Info" in collist:
+  print("TThe collection Main_Info already exists.")
+else: 
+  db.create_collection('Main_Info')
+
+
+if "Reservas_Status" in collist:
+  print("The collection Reservas_Status already exists.")
+else: 
+  db.create_collection('Reservas_Status')
+
+
+if "Stays_Info" in collist:
+  print(f"The collection Stays_Info already exists.")
+else: 
+  db.create_collection('Stays_Info')
 
 
 main_info = db.Main_Info
