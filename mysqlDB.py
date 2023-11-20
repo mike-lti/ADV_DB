@@ -60,12 +60,12 @@ mycursor.execute('DROP TABLE IF EXISTS Reservas_Status')
 mycursor.execute("""
 CREATE TABLE Reservas_Status (
     id_reservation INT,
-    is_cancelled INT,
+    is_canceled INT,
     arrival_date_year INT,
     arrival_date_month INT,
-    angent VARCHAR(255),
+    agent VARCHAR(255),
     previous_cancellations INT,
-    previous_bookings_not_cancelled INT,
+    previous_bookings_not_canceled INT,
     country VARCHAR(255),
     deposit_type VARCHAR(255),
     reservation_status VARCHAR(255),
@@ -80,8 +80,8 @@ mycursor.execute("""
 CREATE TABLE Stays_Info (
     id_reservation INT,
     stays_in_week_nights INT,
-    stays_in_weekends_nights INT,
-    adult INT,
+    stays_in_weekend_nights INT,
+    adults INT,
     children INT,
     babies INT,
     required_car_parking_spaces INT,
@@ -122,8 +122,8 @@ INSERT INTO Main_Info (
 reservas_status_insert_query = """
 INSERT INTO Reservas_Status (
     id_reservation, is_cancelled, arrival_date_year,
-    arrival_date_month, angent, previous_cancellations,
-    previous_bookings_not_cancelled, country, deposit_type,
+    arrival_date_month, agent, previous_cancellations,
+    previous_bookings_not_canceled, country, deposit_type,
     reservation_status
 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 """
@@ -131,7 +131,7 @@ INSERT INTO Reservas_Status (
 stays_info_insert_query = """
 INSERT INTO Stays_Info (
     id_reservation, stays_in_week_nights,
-    stays_in_weekends_nights, adult, children, babies,
+    stays_in_weekend_nights, adults, children, babies,
     required_car_parking_spaces, meal, reserved_room_type,
     total_of_special_requests
 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
