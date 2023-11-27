@@ -20,7 +20,7 @@ collist = db.list_collection_names()
 if "Main_Info" in collist:
   print("TThe collection Main_Info already exists.")
 else: 
-  db.create_collection('Main_Info')
+  db.create_collection('main_info')
   main_info = db.Main_Info
   new_result1 = main_info.insert_many(data1)
 
@@ -29,7 +29,7 @@ if "Reservas_Status" in collist:
   print("The collection Reservas_Status already exists.")
 else: 
   
-  db.create_collection('Reservas_Status')
+  db.create_collection('reservas_status')
   reserva_status = db.Reservas_Status
   new_result2 = reserva_status.insert_many(data2)
 
@@ -37,7 +37,7 @@ else:
 if "Stays_Info" in collist:
   print(f"The collection Stays_Info already exists.")
 else: 
-  db.create_collection('Stays_Info')
+  db.create_collection('stays_info')
   stays_info = db.Stays_Info
   new_result3 = stays_info.insert_many(data3)
 
