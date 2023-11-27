@@ -19,9 +19,9 @@ df_selected1 = df[columns1]
 
 df_selected2 = df[columns2]
 
-df_selected.to_csv("Tabela1.csv", index=True, index_label="id_reservation")
-df_selected1.to_csv("Tabela2.csv", index=True, index_label="id_reservation")
-df_selected2.to_csv("Tabela3.csv", index=True, index_label="id_reservation")
+df_selected.to_csv("Tabela1.csv", index=False)
+df_selected1.to_csv("Tabela2.csv", index=False)
+df_selected2.to_csv("Tabela3.csv", index=False)
 
 df1 = pd.read_csv('Tabela1.csv')
 df2 = pd.read_csv('Tabela2.csv')
