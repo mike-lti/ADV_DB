@@ -35,12 +35,12 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 mycursor.execute('DROP TABLE IF EXISTS Main_Info')
 mycursor.execute("""
-CREATE TABLE Main_Info (
+CREATE TABLE main_info (
     id_reservation INT AUTO_INCREMENT PRIMARY KEY,
     hotel VARCHAR(255),
     lead_time INT,
     arrival_date_year INT,
-    arrival_date_month INT,
+    arrival_date_month VARCHAR(255),
     arrival_date_week_number INT,
     arrival_date_day_of_month INT,
     country VARCHAR(255),
@@ -58,11 +58,11 @@ CREATE TABLE Main_Info (
 
 mycursor.execute('DROP TABLE IF EXISTS Reservas_Status')
 mycursor.execute("""
-CREATE TABLE Reservas_Status (
+CREATE TABLE reservas_status (
     id_reservation INT,
     is_canceled INT,
     arrival_date_year INT,
-    arrival_date_month INT,
+    arrival_date_month VARCHAR(255),
     agent VARCHAR(255),
     previous_cancellations INT,
     previous_bookings_not_canceled INT,
@@ -77,7 +77,7 @@ CREATE TABLE Reservas_Status (
 
 mycursor.execute('DROP TABLE IF EXISTS Stays_Info')
 mycursor.execute("""
-CREATE TABLE Stays_Info (
+CREATE TABLE stays_info (
     id_reservation INT,
     stays_in_week_nights INT,
     stays_in_weekend_nights INT,
