@@ -109,33 +109,7 @@ df_reservas_status_list = df_reservas_status.values.tolist()
 df_stays_info = pd.read_csv("Tabela3.csv")
 df_stays_info_list = df_stays_info.values.tolist()
 
-main_info_insert_query = """
-INSERT INTO Main_Info (
-    hotel, lead_time, arrival_date_year, arrival_date_month,
-    arrival_date_week_number, arrival_date_day_of_month,
-    country, market_segment, distribution_channel,
-    is_repeated_guest, booking_changes, days_in_waiting_list,
-    company, customer_type, reservation_status_date
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-"""
-
-reservas_status_insert_query = """
-INSERT INTO Reservas_Status (
-    id_reservation, is_cancelled, arrival_date_year,
-    arrival_date_month, agent, previous_cancellations,
-    previous_bookings_not_canceled, country, deposit_type,
-    reservation_status
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-"""
-
-stays_info_insert_query = """
-INSERT INTO Stays_Info (
-    id_reservation, stays_in_week_nights,
-    stays_in_weekend_nights, adults, children, babies,
-    required_car_parking_spaces, meal, reserved_room_type,
-    total_of_special_requests
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-"""
+ 
 
 mycursor.executemany(main_info_insert_query, df_main_info_list)
 mycursor.executemany(reservas_status_insert_query, df_reservas_status_list)
