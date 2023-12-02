@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import json
+import time
 
 
 client = MongoClient('localhost', 27017)
@@ -40,7 +41,48 @@ else:
   new_result3 = stays_info.insert_many(data3)
 
 
-"""
+db.stays_info.create_index("id_reservation")
+db.reservas_status.create_index("id_reservation")
+db.main_info.create_index("id_reservation")
+
+#Quais são os país que tiveram reservas alteradas superior a 90 e, em que ano isto ocorreu? 
+pipeline = [
+    {
+        "$match": {
+            "booking_changes": 0,
+            "country": {"$ne": None}
+        }
+    },
+    {
+        "$group": {
+            "_id": {
+                "arrival_date_year": "$arrival_date_year",
+                "country": "$country"
+            },
+            "total_reservas_alteradas": {
+                "$sum": 1
+            }
+        }
+    },
+    {
+        "$match": {
+            "total_reservas_alteradas": {
+                "$gt": 90
+            }
+        }
+    },
+    {
+        "$sort": {
+            "_id.arrival_date_year": 1
+        }
+    }
+]
+start = time.time()
+result = db.main_info.aggregate(pipeline)
+end = time.time()
+print(end-start)
+
+
 #Quais são os país que tiveram reservas alteradas superior a 100 e, em que ano isto ocorreu? 
 pipeline = [
     {
@@ -73,44 +115,61 @@ pipeline = [
         }
     }
 ]
-"""
+start = time.time()
+result = db.main_info.aggregate(pipeline)
+end = time.time()
+print(end-start)
+
 
 queryComplex = [
     {
         '$lookup': {
-            'from': 'reservas_status',
-            'localField': 'id_reservation',
-            'foreignField': 'id_reservation',
-            'as': 'results'
+            'from': 'reservas_status', 
+            'localField': 'id_reservation', 
+            'foreignField': 'id_reservation', 
+            'as': 'reservation_status'
         }
-    },
-    {
-        "$unwind": "$results"
-    },
-    {
+    }, {
+        '$unwind': '$reservation_status'
+    }, {
         '$match': {
             '$and': [
                 {
                     '$or': [
-                        {'results.children': {'$gt': 0}},
-                        {'results.babies': {'$gt': 0}}
+                        {
+                            'children': {
+                                '$gt': 0
+                            }
+                        }, {
+                            'babies': {
+                                '$gt': 0
+                            }
+                        }
                     ]
+                }, {
+                    'reservation_status.is_canceled': 1
                 },
-                {
-                  'results.is_canceled': {'$eq': 1}
-                }
+                
             ]
-        }
+            
+        },
+
+        
     }
-    
 ]
 
+
+start = time.time()
 result = db.stays_info.aggregate(queryComplex)
+end = time.time()
 
-# Print the result
-for doc in result:
-    print(doc)
+print(end-start)
 
+
+
+
+
+#casais sem filhos ou com filhos tem parqueamento ou refeições
 queryComplexTwo = [
     {
         '$match': {
@@ -126,33 +185,114 @@ queryComplexTwo = [
                         {'required_car_parking_spaces': 1},
                         {'meal': 'BB'}
                     ]
-                }
+                },
+                
             ]
         }
     }
 ]
-
-# Execute the aggregation pipeline
+start = time.time()
 resultTwo = list(db.stays_info.aggregate(queryComplexTwo))
-
-# Print the result
-for doc in resultTwo:
-    print(doc)
-
-# Execute the aggregation pipeline
-#result = db.stays_info.aggregate(queryComplex)
-
-# Print the result
-#for doc in result:
-    #print(doc)
+end = time.time()
+print(end-start)
 
 
+# Atualizar um campo 'hotel' para "City Seven" onde 'hotel' é igual a "Resort Hotel"
+filter_condition = {"hotel": "Resort Hotel"}
+update_data = {"$set": {"hotel": "City Seven"}}
+
+result = db.main_info.update_one(filter_condition, update_data)
+
+print(f"Total de documentos correspondentes: {result.matched_count}")
+print(f"Total de documentos modificados: {result.modified_count}")
+
+
+#criacao de uma nova reserva
+main_info_insert={
+    "id_reservation": 119391,
+    "hotel": "BDA Hotel",
+    "lead_time": 30,
+    "arrival_date_year": 2023,
+    "arrival_date_month": "December",
+    "arrival_date_week_number": 48,
+    "arrival_date_day_of_month": 1,
+    "country": "PRT",
+    "market_segment": "Direct",
+    "distribution_channel": "Direct",
+    "is_repeated_guest": 0,
+    "booking_changes": 2,
+    "days_in_waiting_list": 0,
+    "company": "BDA",
+    "customer_type": "Transient",
+    "reservation_status_date": "2023-12-01"}
+
+
+stay_info_insert={
+  "id_reservation": 119391,
+  "stays_in_week_nights": 0,
+  "stays_in_weekend_nights": 0,
+  "adults": 2,
+  "children": 0,
+  "babies": 0,
+  "required_car_parking_spaces": 0,
+  "meal": "BB",
+  "reserved_room_type": "C",
+  "total_of_special_requests": 0
+}
+
+reservation_status_insert={
+    "id_reservation": 119391,
+    "is_canceled": 0,
+    "arrival_date_year": 2023,
+    "arrival_date_month": "December",
+    "agent": 48,
+    "previous_cancellations": 1,
+    "previous_bookings_not_canceled": 0,
+    "country": "PRT",
+    "deposit_type": "No Deposit",
+    "reservation_status": "Check-Out"
+    }
+
+
+# Inserir o novo documento na coleção
+try:
+    result = db.main_info.insert_one(main_info_insert)
+    
+    # Verificar se a inserção foi bem-sucedida
+    if result.inserted_id:
+        print(f"Novo documento inserido com sucesso. ID: {result.inserted_id}")
 
 
 
+except Exception as e:
+    print(f"Falha ao inserir o documento. Erro: {e}")
+
+try:
+    result = db.stays_info.insert_one(stay_info_insert)
+    
+    # Verificar se a inserção foi bem-sucedida
+    if result.inserted_id:
+        print(f"Novo documento inserido com sucesso. ID: {result.inserted_id}")
 
 
-#print(f"IDs inseridos: {new_result1.inserted_ids}")
-#print(f"IDs inseridos: {new_result2.inserted_ids}")
-#print(f"IDs inseridos : {new_result3.inserted_ids}")
+
+except Exception as e:
+    print(f"Falha ao inserir o documento. Erro: {e}")
+
+try:
+    result = db.reservas_status.insert_one(reservation_status_insert)
+    
+    # Verificar se a inserção foi bem-sucedida
+    if result.inserted_id:
+        print(f"Novo documento inserido com sucesso. ID: {result.inserted_id}")
+
+
+
+except Exception as e:
+    print(f"Falha ao inserir o documento. Erro: {e}")   
+
+result = db.main_info.delete_one(main_info_insert)
+result = db.stays_info.delete_one(stay_info_insert)
+result = db.reservas_status.delete_one(reservation_status_insert)
+
 client.close()
