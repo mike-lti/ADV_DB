@@ -116,7 +116,7 @@ df_stays_info_list = df_stays_info.values.tolist()
 # mycursor.executemany(stays_info_insert_query, df_stays_info_list)
 # mydb.commit()
 
-
+#query complexa 1 casais sem filhos ou com filhos quem cancela mais reservas
 complex_query1 = """"
 SELECT *
 FROM main_info 
@@ -138,6 +138,7 @@ try:
 except mysql.connector.Error as err:
     print("Error executing query", err)
 
+#query complexa 2 casais sem filhos ou com filhos tem parqueamento e/ou refeições
 complex_query2 = """"
 SELECT *
 FROM main_info 
@@ -149,6 +150,16 @@ WHERE stays_info.adults > 0
     OR stays_info.meal != 'SC') limit 5;
 """
 
+
+try:
+    mycursor.execute(complex_query2)
+
+    results = mycursor.fetchall()
+
+    for row in results:
+        print(row)
+except mysql.connector.Error as err:
+    print("Error executing query", err)
 
 
 # Close the connection to the database
