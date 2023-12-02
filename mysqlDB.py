@@ -111,10 +111,44 @@ df_stays_info_list = df_stays_info.values.tolist()
 
  
 
-mycursor.executemany(main_info_insert_query, df_main_info_list)
-mycursor.executemany(reservas_status_insert_query, df_reservas_status_list)
-mycursor.executemany(stays_info_insert_query, df_stays_info_list)
-mydb.commit()
+# mycursor.executemany(main_info_insert_query, df_main_info_list)
+# mycursor.executemany(reservas_status_insert_query, df_reservas_status_list)
+# mycursor.executemany(stays_info_insert_query, df_stays_info_list)
+# mydb.commit()
+
+
+complex_query1 = """"
+SELECT *
+FROM main_info 
+JOIN stays_info ON main_info.id_reservation = stays_info.id_reservation
+JOIN reservas_status ON main_info.id_reservation = reservas_status.id_reservation
+WHERE stays_info.adults > 0
+  AND (stays_info.children > 0 OR stays_info.babies > 0)
+  AND reservas_status.reservation_status != 'Canceled'
+LIMIT 0, 50000;
+"""
+
+try:
+    mycursor.execute(complex_query1)
+
+    results = mycursor.fetchall()
+
+    for row in results:
+        print(row)
+except mysql.connector.Error as err:
+    print("Error executing query", err)
+
+complex_query2 = """"
+SELECT *
+FROM main_info 
+JOIN stays_info ON main_info.id_reservation = stays_info.id_reservation
+WHERE stays_info.adults > 0 
+  AND (stays_info.children > 0 OR stays_info.babies > 0) 
+  AND (stays_info.required_car_parking_spaces > 0 
+    OR stays_info.meal != 'Undefined' 
+    OR stays_info.meal != 'SC') limit 5;
+"""
+
 
 
 # Close the connection to the database
