@@ -8,7 +8,7 @@ CREATE TABLE Tabela1(
     hotel VARCHAR(255) NOT NULL,
     lead_time int NOT NULL,
     arrival_date_year int NOT NULL, 
-    arrival_date_month int NOT NULL,
+    arrival_date_month varchar(255) NOT NULL,
     arrival_date_week_number int NOT NULL,
     arrival_date_day_of_month int NOT NULL,
     country VARCHAR(255) NOT NULL,
