@@ -19,15 +19,15 @@ df_selected1 = df[columns1]
 
 df_selected2 = df[columns2]
 
-df_selected.to_csv("Tabela1.csv", index=False)
-df_selected1.to_csv("Tabela2.csv", index=False)
-df_selected2.to_csv("Tabela3.csv", index=False)
+df_selected.to_csv("Tabela1.csv", index=True, index_label="id_reservation")
+df_selected1.to_csv("Tabela2.csv", index=True, index_label="id_reservation")
+df_selected2.to_csv("Tabela3.csv", index=True, index_label="id_reservation")
 
 df1 = pd.read_csv('Tabela1.csv')
 df2 = pd.read_csv('Tabela2.csv')
 df3 = pd.read_csv('Tabela3.csv')
 
-
+#do the code here to place a field called id_reservation to appear in the json file
 df1.to_json("Tabela1.json",orient = "records", date_format = "epoch", 
 double_precision = 10, force_ascii = True, date_unit = "ms", default_handler = None, indent=2)
 df2.to_json("Tabela2.json",orient = "records", date_format = "epoch", 
@@ -35,3 +35,10 @@ double_precision = 10, force_ascii = True, date_unit = "ms", default_handler = N
 df3.to_json("Tabela3.json",orient = "records", date_format = "epoch", 
 double_precision = 10, force_ascii = True, date_unit = "ms", default_handler = None, indent=2)
 
+df1.pop('id_reservation')
+df2.pop('id_reservation')
+df3.pop('id_reservation')
+
+df1.to_csv("Tabela1.csv", index=False)
+df2.to_csv("Tabela2.csv", index=False)
+df3.to_csv("Tabela3.csv", index=False)
