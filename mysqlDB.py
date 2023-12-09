@@ -3,7 +3,6 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from sqlalchemy.types import Integer, Float, String
 
-
 # Creates the database
 mydb = mysql.connector.connect(
   host="localhost",
@@ -11,8 +10,6 @@ mydb = mysql.connector.connect(
   password = '1234'
   
 )
-
-
 
 mycursor = mydb.cursor()
 
@@ -119,108 +116,101 @@ df_stays_info_list = df_stays_info.values.tolist()
 #Query simples 1 "Quais são os país que tiveram resevas superior a 1000 e, em que ano e mes que isto aconteceu e o hotel que mais requições teve?"
 start_time = time.time()
 
-# Consulta SQL corrigida
 sql_consulta = """
-    SELECT
-        hotel,
-        country,
-        arrival_date_year AS arrival_year,
-        arrival_date_month AS arrival_month,
-        COUNT(*) AS total_reservas
-    FROM
-        main_info 
-    GROUP BY
-        hotel, country, arrival_date_year, arrival_date_month
-    HAVING
-        COUNT(*) > 1000
-    ORDER BY
-        total_reservas DESC
+    SELECT hotel,country,arrival_date_year AS arrival_year,arrival_date_month AS arrival_month,COUNT(*) AS total_reservas
+    FROM main_info GROUP BY hotel, country, arrival_date_year, arrival_date_month HAVING COUNT(*) > 500 ORDER BY total_reservas DESC
 """
-# Execute a consulta e armazena o resultado em um DataFrame
-df_sql = pd.read_sql(sql_consulta, con=engine)
+explain_query = f"{sql_consulta}"
+mycursor.execute(explain_query)
+explain_result = mycursor.fetchall()
+# Crie uma lista de dicionários a partir do resultado
+columns = ["country", "hotel", "arrival_year", "arrival_month", "babies", "total_reservas"]
+explain_rows = [dict(zip(columns, row)) for row in explain_result]
+# Converta a lista de dicionários em um DataFrame
+df_explain = pd.DataFrame(explain_rows)
+# Exiba o DataFrame
+print(df_explain)
+# Calcule e exiba o tempo de execução
 end_time = time.time()
 execution_time = end_time - start_time
-# Exiba o DataFrame resultante
-print(df_sql)
-print(f"Tempo de execução: {execution_time:.2f} segundos.")
+data_hora_execucao = datetime.now()
+print(f"Tempo de execução: {execution_time:.2f} segundos.\nData e Hora da execução: {data_hora_execucao}")
 
 #Query simple 2 "Quais são os país que tiveram resevas alteradas suerior a 100 e, em que ano isto ocorreu?"
 #R:
 start_time = time.time()
 sqlConsult = """
-    SELECT
-    arrival_date_year,
-    country,
-    COUNT(*) AS total_reservas_alteradas
-FROM
-    main_info
-WHERE
-    booking_changes = 0 
-GROUP BY
-    arrival_date_year, country
-HAVING
-    COUNT(*) > 90
-ORDER BY
-    arrival_date_year;
+    SELECT country, arrival_date_year, COUNT(*) AS total_reservas_alteradas FROM main_info
+   WHERE booking_changes = 0 GROUP BY arrival_date_year, country HAVING COUNT(*) > 90 ORDER BY arrival_date_year;
 """
 #A cláusula HAVING é usada em combinação com GROUP BY para filtrar os resultados de uma agregação com base a contagem das reservas.
 #Neste caso, estamos filtrando os resultados para incluir apenas as linhas onde o total de reservas é maior que 100.
-dfSql = pd.read_sql(sqlConsult, con=engine)
+explain_query = f"{sqlConsult}"
+mycursor.execute(explain_query)
+explain_result = mycursor.fetchall()
+# Cria uma lista de dicionários a partir do resultado
+columns = ["country", "arrival_year", "total_reservas_alteradas"]
+explain_rows = [dict(zip(columns, row)) for row in explain_result]
+# Converta a lista de dicionários em um DataFrame
+df_explain = pd.DataFrame(explain_rows)
+# Exiba o DataFrame
+print(df_explain)
+# Calcule e exiba o tempo de execução
 end_time = time.time()
 execution_time = end_time - start_time
-#Estas linhas, permitem remover o numero total de linhas e colunas a serem exibidas 
-#pd.set_option('display.max_rows', None)
-#pd.set_option('display.max_columns', None)
-# Exiba o DataFrame resultante
-print(dfSql)
-print(f"Tempo de execução: {execution_time:.2f} segundos.")
+data_hora_execucao = datetime.now()
+print(f"Tempo de execução: {execution_time:.2f} segundos.\nData e Hora da execução: {data_hora_execucao}")
 
 
 #query complexa 1 casais sem filhos ou com filhos quem cancela mais reservas
-complex_query1 = """"
-SELECT main_info.country, main_info.hotel, stays_info.adults, stays_info.children, reservas_status.reservation_status
-    FROM main_info 
-    JOIN stays_info ON main_info.id_reservation = stays_info.id_reservation
+
+complex_query1 = """
+    SELECT main_info.country, main_info.hotel, stays_info.adults, stays_info.children,stays_info.babies, reservas_status.reservation_status
+    FROM main_info JOIN stays_info ON main_info.id_reservation = stays_info.id_reservation
     JOIN reservas_status ON main_info.id_reservation = reservas_status.id_reservation
-    WHERE stays_info.adults > 0
-      AND (stays_info.children > 0 OR stays_info.babies > 0)
-      AND reservas_status.reservation_status NOT LIKE 'Canceled'
-    LIMIT 0, 20;
+    WHERE stays_info.adults > 0 AND (stays_info.children > 0 OR stays_info.babies > 0) AND reservas_status.reservation_status NOT LIKE 'Canceled';
 """
-
-try:
-    mycursor.execute(complex_query1)
-
-    results = mycursor.fetchall()
-
-    for row in results:
-        print(row)
-except mysql.connector.Error as err:
-    print("Error executing query", err)
+# Execute a consulta e armazene o resultado em um DataFrame
+explain_query = f"{complex_query1}"
+mycursor.execute(explain_query)
+explain_result = mycursor.fetchall()
+# Crie uma lista de dicionários a partir do resultado
+columns = ["country", "hotel", "adults", "children", "babies", "reservation_status"]
+explain_rows = [dict(zip(columns, row)) for row in explain_result]
+# Converta a lista de dicionários em um DataFrame
+df_explain = pd.DataFrame(explain_rows)
+# Exiba o DataFrame
+print(df_explain)
+# Calcule e exiba o tempo de execução
+end_time = time.time()
+execution_time = end_time - start_time
+data_hora_execucao = datetime.now()
+print(f"Tempo de execução: {execution_time:.2f} segundos.\nData e Hora da execução: {data_hora_execucao}")
 
 #query complexa 2 casais sem filhos ou com filhos tem parqueamento e/ou refeições
-complex_query2 = """"
-SELECT main_info.country, main_info.hotel, stays_info.adults, stays_info.babies, stays_info.required_car_parking_spaces as car_parking , stays_info.children, stays_info.meal
-    FROM main_info 
-    JOIN stays_info ON main_info.id_reservation = stays_info.id_reservation
-    WHERE stays_info.adults > 0 
-      AND (stays_info.children > 0 OR stays_info.babies > 0) 
-      AND (stays_info.required_car_parking_spaces > 0 
-        OR stays_info.meal NOT LIKE 'Undefined' 
-        OR stays_info.meal NOT LIKE 'SC')
-    LIMIT 20;
+complex_query2 = """
+    SELECT main_info.country, main_info.hotel,stays_info.adults,stays_info.children,stays_info.babies,
+    stays_info.required_car_parking_spaces,stays_info.meal
+    FROM main_info JOIN stays_info ON main_info.id_reservation = stays_info.id_reservation
+    WHERE stays_info.adults > 0 AND (stays_info.children > 0 OR stays_info.babies > 0) AND (stays_info.required_car_parking_spaces > 0 
+      OR stays_info.meal NOT LIKE 'Undefined' OR stays_info.meal NOT LIKE 'SC');
 """
-
-
-try:
-    mycursor.execute(complex_query2)
-
-    results = mycursor.fetchall()
-
-    for row in results:
-        print(row)
-except mysql.connector.Error as err:
-    print("Error executing query", err)
+# Execute a consulta e armazene o resultado em um DataFrame
+explain_query1 = f"{complex_query2}"
+mycursor.execute(explain_query1)
+explain_result1 = mycursor.fetchall()
+# Crie uma lista de dicionários a partir do resultado
+columns = ["country", "hotel", "adults", "children", "babies", "car_parking", "meal"]
+explain_rows1 = [dict(zip(columns, row)) for row in explain_result1]
+# Converta a lista de dicionários em um DataFrame
+df_explain1 = pd.DataFrame(explain_rows1)
+# Exiba o DataFrame
+print(df_explain1)
+# Calcule e exiba o tempo de execução
+end_time = time.time()
+execution_time = end_time - start_time
+data_hora_execucao = datetime.now()
+print(f"Tempo de execução: {execution_time:.2f} segundos.\nData e Hora da execução: {data_hora_execucao}")
 
 
 #Actualização de dados na tabela Main_info
@@ -240,7 +230,8 @@ with engine.begin() as connection:
 end_time = time.time()
 execution_time = end_time - start_time
 print("Atualização concluída com sucesso.")
-print(f"Tempo de execução: {execution_time:.2f} segundos.")
+data_hora_execucao = datetime.now()
+print(f"Tempo de execução: {execution_time:.2f} segundos.\nData e Hora da execução: {data_hora_execucao}")
 
 #Inserção de dados na tabela Main_info
 try:
@@ -280,7 +271,8 @@ try:
     print("Inserção concluída com sucesso.")
     print("Registro inserido:")
     print(inserted_record)
-    print(f"Tempo de execução: {execution_time:.2f} segundos.")
+   data_hora_execucao = datetime.now()
+   print(f"Tempo de execução: {execution_time:.2f} segundos.\nData e Hora da execução: {data_hora_execucao}")
 
 except Exception as e:
     print(f"Erro durante a inserção: {str(e)}")
@@ -329,7 +321,8 @@ except exc.IntegrityError as e:
  
 end_time = time.time()
 execution_time = end_time - start_time
-print(f"Tempo de execução: {execution_time:.2f} segundos.")
+data_hora_execucao = datetime.now()
+print(f"Tempo de execução: {execution_time:.2f} segundos.\nData e Hora da execução: {data_hora_execucao}")
 
 #Criação indices
 mycursor = mydb.cursor()
@@ -346,6 +339,8 @@ mycursor.execute("CREATE INDEX idx_id_reservation_stays ON stays_info(id_reserva
 # Confirmar as alterações no banco de dados
 mydb.commit()
 print("Índices criados com sucesso!")
+data_hora_execucao = datetime.now()
+print(f"Tempo de execução: {execution_time:.2f} segundos.\nData e Hora da execução: {data_hora_execucao}")
 
 # Close the connection to the database
 mydb.close()
