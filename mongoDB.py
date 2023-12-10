@@ -1,10 +1,15 @@
 from pymongo import MongoClient
 import json
 import time
+import pandas as pd
 
 
 client = MongoClient('localhost', 27017)
+#apagar a base de dados se existir
+if 'DataBaseProj' in client.list_database_names():
+   client.drop_database('DataBaseProj')
 
+#load dos ficheiro para cada documento
 f = open('Tabela1.json')
 data1 = json.load(f)
 f = open('Tabela2.json')
@@ -12,10 +17,13 @@ data2 = json.load(f)
 f = open('Tabela3.json')
 data3 = json.load(f)
 
+#criação da base de dados
 db=client.DataBaseProj
 
 collist = db.list_collection_names()
 
+
+#criar
 if "main_info" in collist:
   print("The collection Main_Info already exists.")
 else: 
@@ -41,15 +49,7 @@ else:
   new_result3 = stays_info.insert_many(data3)
 
 
-
-if len(db.stays_info.index_information()) == 1:
-    db.stays_info.create_index("id_reservation")
-if len(db.reservas_status.index_information()) == 1:
-    db.reservas_status.create_index("id_reservation")
-if len(db.main_info.index_information()) == 1:
-    db.main_info.create_index("id_reservation")
-
-#Quais são os país que tiveram reservas alteradas superior a 90 e, em que ano isto ocorreu? 
+print("Quais são os país que tiveram reservas alteradas superior a 90 e, em que ano isto ocorreu?")
 pipeline = [
     {
         "$match": {
@@ -93,7 +93,7 @@ for doc in result:
 print("Time taken:", end - start)
 
 
-#Quais são os país que tiveram um numero de reservas alteradas superior a 500 e, em que ano isto ocorreu? 
+print("Quais são os país que tiveram um numero de reservas alteradas superior a 500 e, em que ano isto ocorreu? ")
 pipeline = [
     {
         "$match": {
@@ -133,7 +133,7 @@ for doc in result:
 
 print("Time taken:", end - start)
 
-#how many families with kids cancelled their reservations
+print("how many families with kids cancelled their reservations")
 queryComplex = [
     {
         '$lookup': {
@@ -179,20 +179,10 @@ start = time.time()
 result = db.stays_info.aggregate(queryComplex)
 
 end = time.time()
-docs = list(result)
-for idx, doc in enumerate(docs):
-    print(doc)
-    if idx == 9:  
-        break
-print("Number of results:", len(docs))
-
-print("Time taken:", end - start)
+print("Time taken without indexes:", end - start)
 
 
-
-
-
-#casais sem filhos ou com filhos tem parqueamento ou refeições
+print("casais sem filhos ou com filhos tem parqueamento ou refeições")
 queryComplexTwo = [
     {
         '$match': {
@@ -218,17 +208,12 @@ queryComplexTwo = [
 start = time.time()
 resultTwo = list(db.stays_info.aggregate(queryComplexTwo))
 end = time.time()
-docs = list(resultTwo)
-for idx, doc in enumerate(docs):
-    print(doc)
-    if idx == 9:  
-        break
-print("Number of results:", len(docs))
-
-print("Time taken:", end - start)
 
 
-# Atualizar um campo 'hotel' para "City Seven" onde 'hotel' é igual a "Resort Hotel"
+print("Time taken without indexes:", end - start)
+
+
+print("Atualizar um campo 'hotel' para City Seven onde 'hotel' é igual a Resort Hotel")
 filter_condition = {"hotel": "Resort Hotel"}
 update_data = {"$set": {"hotel": "City Seven"}}
 
@@ -238,7 +223,7 @@ print(f"Total de documentos correspondentes: {result.matched_count}")
 print(f"Total de documentos modificados: {result.modified_count}")
 
 
-#criacao de uma nova reserva
+print("criacao de uma nova reserva")
 main_info_insert={
     "id_reservation": 119391,
     "hotel": "BDA Hotel",
@@ -321,9 +306,118 @@ try:
 
 except Exception as e:
     print(f"Falha ao inserir o documento. Erro: {e}")   
-"""
-result = db.main_info.delete_one(main_info_insert)
-result = db.stays_info.delete_one(stay_info_insert)
-result = db.reservas_status.delete_one(reservation_status_insert)
-"""
+
+
+
+print("Creating indexes")
+if len(db.stays_info.index_information()) == 1:
+    db.stays_info.create_index("id_reservation")
+if len(db.reservas_status.index_information()) == 1:
+    db.reservas_status.create_index("id_reservation")
+if len(db.main_info.index_information()) == 1:
+    db.main_info.create_index("id_reservation")
+
+print("how many families with kids cancelled their reservations")
+queryComplex = [
+    {
+        '$lookup': {
+            'from': 'reservas_status', 
+            'localField': 'id_reservation', 
+            'foreignField': 'id_reservation', 
+            'as': 'reservation_status'
+        }
+    }, {
+        '$unwind': '$reservation_status'
+    }, {
+        '$match': {
+            '$and': [
+                {
+                    '$or': [
+                        {
+                            'children': {
+                                '$gt': 0
+                            }
+                        }, {
+                            'babies': {
+                                '$gt': 0
+                            }
+                        }
+                    ]
+                }, {
+                    'reservation_status.is_canceled': 1
+                },
+                
+            ]
+            
+        },
+    
+
+        
+    }, 
+    
+    
+]
+
+
+start = time.time()
+result = db.stays_info.aggregate(queryComplex)
+end = time.time()
+docs = list(result)
+
+df = pd.DataFrame(docs)
+
+
+
+
+
+# Print specific columns
+print(df[['_id', 'children', 'babies']].head(10))
+
+
+
+print("Number of results:", len(docs))
+print("Time taken with indexes:", end - start)
+
+
+print("casais sem filhos ou com filhos tem parqueamento ou refeições")
+queryComplexTwo = [
+    {
+        '$match': {
+            '$and': [
+                {
+                    '$or': [
+                        {'babies': {'$gt': 0}},
+                        {'children': {'$gt': 0}}
+                    ]
+                },
+                {
+                    '$or': [
+                        {'required_car_parking_spaces': 1},
+                        {'meal': 'BB'}
+                    ]
+                },
+                
+            ]
+        }
+    },
+    
+]
+start = time.time()
+resultTwo = list(db.stays_info.aggregate(queryComplexTwo))
+end = time.time()
+docs = list(resultTwo)
+df = pd.DataFrame(docs)
+
+
+
+
+
+# Print specific columns
+print(df[['_id', 'children', 'babies', 'required_car_parking_spaces', 'meal']].head(10))
+
+print("Number of results:", len(docs))
+
+print("Time taken with indexes:", end - start)
+
+
 client.close()
