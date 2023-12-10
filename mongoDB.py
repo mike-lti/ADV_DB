@@ -8,6 +8,7 @@ client = MongoClient('localhost', 27017)
 #apagar a base de dados se existir
 if 'DataBaseProj' in client.list_database_names():
    client.drop_database('DataBaseProj')
+   print("Previous database deleted with success\n")
 
 #load dos ficheiro para cada documento
 f = open('Tabela1.json')

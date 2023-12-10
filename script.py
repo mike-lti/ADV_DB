@@ -44,6 +44,7 @@ df3.to_json("Tabela3.json",orient = "records", date_format = "epoch",
 double_precision = 10, force_ascii = True, date_unit = "ms", default_handler = None, indent=2)
 #Tratamento de dados para mysql
 df1.pop('id_reservation')
+#AUTO INCREMENT  comeca em um portanto para obedecer ao padrao incrementamos 1
 df2["id_reservation"] = df2["id_reservation"] + 1
 df3["id_reservation"] = df3["id_reservation"] + 1
 #creation of csv to be used to create mysql db

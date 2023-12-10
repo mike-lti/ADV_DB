@@ -191,7 +191,7 @@ end_time = time.time()
 execution_time = end_time - start_time
 data_hora_execucao = datetime.now()
 print(f"Tempo de execução: {execution_time:.2f} segundos.\nData e Hora da execução: {data_hora_execucao}")
-print('QUERY COMPLEXA 1 CASAIS SEM FILHO OU COM FILHOS QUEM CANCELA MAIS RESERVAS?\n')
+print('how many families with kids cancelled their reservations\n')
 # Consulta complexa 1
 complex_query1 = """
     SELECT main_info.country, main_info.hotel, stays_info.adults, stays_info.children, stays_info.babies, reservas_status.reservation_status
@@ -213,7 +213,7 @@ execution_time = end_time - start_time
 data_hora_execucao = datetime.now()
 print(f"Tempo de execução: {execution_time:.2f} segundos.\nData e Hora da execução: {data_hora_execucao}")
 
-print('QUERY COMPLEXA 2 CASAIS SEM FILHO OU COM FILHOS TEM PARQUEAMENTO E/OU REFEIÇÕES\n')
+print('How many families with kids have parking spaces or meals at the hotel\n')
 start_time = time.time()
 sql_rn_canceladas = """
     SELECT main_info.country, main_info.hotel,stays_info.adults,stays_info.children,stays_info.babies,
