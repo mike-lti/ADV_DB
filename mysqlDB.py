@@ -2,13 +2,12 @@ import mysql.connector
 import pandas as pd
 from datetime import datetime
 import time
-from sqlalchemy import create_engine
-from sqlalchemy.types import Integer, Float, String
+
 # Estabelece a conexão com o MySQL
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    password='cussueca2018'
+    password='1234'
 )
 
 mycursor = mydb.cursor()
@@ -24,7 +23,7 @@ print('Criação de tabelas na base de dados\n')
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    password='cussueca2018',
+    password='1234',
     database='DataBaseProj'
 )
 mycursor = mydb.cursor()
@@ -96,11 +95,6 @@ df_main_info = pd.read_csv("Tabela1.csv")
 df_reservas_status = pd.read_csv("Tabela2.csv")
 df_stays_info = pd.read_csv("Tabela3.csv")
 
-# Substitui valores NaN por 0.0
-default_value = 0.0
-df_main_info.fillna(value=default_value, inplace=True)
-df_reservas_status.fillna(value=default_value, inplace=True)
-df_stays_info.fillna(value=default_value, inplace=True)
 
 # Converte DataFrames para listas
 df_main_info_list = df_main_info.values.tolist()
@@ -320,14 +314,14 @@ print('Inserção de novos dados nas tabelas com chaves estrangeiras (reservas_s
 mydb = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="cussueca2018",
+        password="1234",
         database="DataBaseProj"
     )
 try:
     start_time = time.time()
 
     data_reservas_status = {
-        'id_reservation': [119397],
+        'id_reservation': [119391],
         'is_canceled': [0],
         'arrival_date_year': [2023],
         'arrival_date_month': ['December'],
@@ -340,7 +334,7 @@ try:
     }
 
     data_stays_info = {
-        'id_reservation': [119397],
+        'id_reservation': [119391],
         'stays_in_week_nights': [3],
         'stays_in_weekend_nights': [2],
         'adults': [2],
@@ -404,7 +398,7 @@ print('Criação de índices\n')
 mydb = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="cussueca2018",
+        password="1234",
         database="DataBaseProj"
     )
 try:

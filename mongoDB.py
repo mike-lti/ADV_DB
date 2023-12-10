@@ -15,7 +15,7 @@ data3 = json.load(f)
 db=client.DataBaseProj
 
 collist = db.list_collection_names()
-print(collist)
+
 if "main_info" in collist:
   print("The collection Main_Info already exists.")
 else: 
@@ -41,9 +41,13 @@ else:
   new_result3 = stays_info.insert_many(data3)
 
 
-db.stays_info.create_index("id_reservation")
-db.reservas_status.create_index("id_reservation")
-db.main_info.create_index("id_reservation")
+
+if len(db.stays_info.index_information()) == 1:
+    db.stays_info.create_index("id_reservation")
+if len(db.reservas_status.index_information()) == 1:
+    db.reservas_status.create_index("id_reservation")
+if len(db.main_info.index_information()) == 1:
+    db.main_info.create_index("id_reservation")
 
 #Quais são os país que tiveram reservas alteradas superior a 90 e, em que ano isto ocorreu? 
 pipeline = [
@@ -75,15 +79,21 @@ pipeline = [
         "$sort": {
             "_id.arrival_date_year": 1
         }
-    }
+    },
+
+    
 ]
 start = time.time()
 result = db.main_info.aggregate(pipeline)
 end = time.time()
-print(end-start)
+
+for doc in result:
+    print(doc)
+
+print("Time taken:", end - start)
 
 
-#Quais são os país que tiveram reservas alteradas superior a 100 e, em que ano isto ocorreu? 
+#Quais são os país que tiveram um numero de reservas alteradas superior a 500 e, em que ano isto ocorreu? 
 pipeline = [
     {
         "$match": {
@@ -105,7 +115,7 @@ pipeline = [
     {
         "$match": {
             "total_reservas_alteradas": {
-                "$gt": 100
+                "$gt": 500
             }
         }
     },
@@ -118,9 +128,12 @@ pipeline = [
 start = time.time()
 result = db.main_info.aggregate(pipeline)
 end = time.time()
-print(end-start)
+for doc in result:
+    print(doc)
 
+print("Time taken:", end - start)
 
+#how many families with kids cancelled their reservations
 queryComplex = [
     {
         '$lookup': {
@@ -153,17 +166,27 @@ queryComplex = [
             ]
             
         },
+    
 
         
-    }
+    }, 
+    
+    
 ]
 
 
 start = time.time()
 result = db.stays_info.aggregate(queryComplex)
-end = time.time()
 
-print(end-start)
+end = time.time()
+docs = list(result)
+for idx, doc in enumerate(docs):
+    print(doc)
+    if idx == 9:  
+        break
+print("Number of results:", len(docs))
+
+print("Time taken:", end - start)
 
 
 
@@ -189,12 +212,20 @@ queryComplexTwo = [
                 
             ]
         }
-    }
+    },
+    
 ]
 start = time.time()
 resultTwo = list(db.stays_info.aggregate(queryComplexTwo))
 end = time.time()
-print(end-start)
+docs = list(resultTwo)
+for idx, doc in enumerate(docs):
+    print(doc)
+    if idx == 9:  
+        break
+print("Number of results:", len(docs))
+
+print("Time taken:", end - start)
 
 
 # Atualizar um campo 'hotel' para "City Seven" onde 'hotel' é igual a "Resort Hotel"
@@ -290,9 +321,9 @@ try:
 
 except Exception as e:
     print(f"Falha ao inserir o documento. Erro: {e}")   
-
+"""
 result = db.main_info.delete_one(main_info_insert)
 result = db.stays_info.delete_one(stay_info_insert)
 result = db.reservas_status.delete_one(reservation_status_insert)
-
+"""
 client.close()
