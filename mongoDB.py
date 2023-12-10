@@ -19,7 +19,7 @@ data3 = json.load(f)
 
 #criação da base de dados
 db=client.DataBaseProj
-
+print("Database created!\n")
 collist = db.list_collection_names()
 
 
@@ -30,7 +30,7 @@ else:
   db.create_collection('main_info')
   main_info = db.main_info
   new_result1 = main_info.insert_many(data1)
-
+  print("Document main_info was created with success\n")
 
 if "reservas_status" in collist:
   print("The collection Reservas_Status already exists.")
@@ -39,7 +39,7 @@ else:
   db.create_collection('reservas_status')
   reserva_status = db.reservas_status
   new_result2 = reserva_status.insert_many(data2)
-
+  print("Document reservas_status was created with success\n")
 
 if "stays_info" in collist:
   print(f"The collection Stays_Info already exists.")
@@ -47,9 +47,9 @@ else:
   db.create_collection('stays_info')
   stays_info = db.stays_info
   new_result3 = stays_info.insert_many(data3)
+  print("Document stays_info was created with success\n")
 
-
-print("Quais são os país que tiveram reservas alteradas superior a 90 e, em que ano isto ocorreu?")
+print("Quais são os país que tiveram reservas alteradas superior a 90 e, em que ano isto ocorreu?\n")
 pipeline = [
     {
         "$match": {
@@ -90,10 +90,10 @@ end = time.time()
 for doc in result:
     print(doc)
 
-print("Time taken:", end - start)
+print("Time taken:", end - start, "\n")
 
 
-print("Quais são os país que tiveram um numero de reservas alteradas superior a 500 e, em que ano isto ocorreu? ")
+print("Quais são os país que tiveram um numero de reservas alteradas superior a 500 e, em que ano isto ocorreu?\n")
 pipeline = [
     {
         "$match": {
@@ -133,7 +133,7 @@ for doc in result:
 
 print("Time taken:", end - start)
 
-print("how many families with kids cancelled their reservations")
+print("how many families with kids cancelled their reservations\n")
 queryComplex = [
     {
         '$lookup': {
@@ -182,7 +182,7 @@ end = time.time()
 print("Time taken without indexes:", end - start)
 
 
-print("casais sem filhos ou com filhos tem parqueamento ou refeições")
+print("casais sem filhos ou com filhos tem parqueamento ou refeições\n")
 queryComplexTwo = [
     {
         '$match': {
@@ -213,7 +213,7 @@ end = time.time()
 print("Time taken without indexes:", end - start)
 
 
-print("Atualizar um campo 'hotel' para City Seven onde 'hotel' é igual a Resort Hotel")
+print("Atualizar um campo 'hotel' para City Seven onde 'hotel' é igual a Resort Hotel\n")
 filter_condition = {"hotel": "Resort Hotel"}
 update_data = {"$set": {"hotel": "City Seven"}}
 
@@ -223,7 +223,7 @@ print(f"Total de documentos correspondentes: {result.matched_count}")
 print(f"Total de documentos modificados: {result.modified_count}")
 
 
-print("criacao de uma nova reserva")
+print("criacao de uma nova reserva\n")
 main_info_insert={
     "id_reservation": 119391,
     "hotel": "BDA Hotel",
@@ -309,7 +309,7 @@ except Exception as e:
 
 
 
-print("Creating indexes")
+print("Creating indexes\n")
 if len(db.stays_info.index_information()) == 1:
     db.stays_info.create_index("id_reservation")
 if len(db.reservas_status.index_information()) == 1:
@@ -317,7 +317,7 @@ if len(db.reservas_status.index_information()) == 1:
 if len(db.main_info.index_information()) == 1:
     db.main_info.create_index("id_reservation")
 
-print("how many families with kids cancelled their reservations")
+print("how many families with kids cancelled their reservations\n")
 queryComplex = [
     {
         '$lookup': {
@@ -379,7 +379,7 @@ print("Number of results:", len(docs))
 print("Time taken with indexes:", end - start)
 
 
-print("casais sem filhos ou com filhos tem parqueamento ou refeições")
+print("casais sem filhos ou com filhos tem parqueamento ou refeições\n")
 queryComplexTwo = [
     {
         '$match': {
